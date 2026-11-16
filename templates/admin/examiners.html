@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3"><h3>Examiners</h3><a class="btn btn-primary" href="{{ url_for('examiner_add') }}">Add Examiner</a></div>
+<div class="table-responsive"><table class="table table-bordered bg-white align-middle">
+<tr><th>ID</th><th>Name</th><th>Email</th><th>Contact</th><th>Department</th><th>Slots</th><th>Status</th><th>Actions</th></tr>
+{% for x in examiners %}
+<tr><td>{{ x.id }}</td><td>{{ x.name }}</td><td>{{ x.email }}</td><td>{{ x.phone or '' }}</td><td>{{ x.department or '' }}</td><td>{{ x.n_slots }}</td><td>{{ badge(x.status) }}</td>
+<td>
+{% if x.status == 'Pending' %}<form method="post" action="{{ url_for('examiner_action', uid=x.id, action='approve') }}"><button class="btn btn-sm btn-success">Approve</button></form>
+{% elif x.status == 'Approved' %}<form method="post" action="{{ url_for('examiner_action', uid=x.id, action='deactivate') }}"><button class="btn btn-sm btn-outline-danger">Deactivate</button></form>
+{% else %}<form method="post" action="{{ url_for('examiner_action', uid=x.id, action='activate') }}"><button class="btn btn-sm btn-outline-success">Activate</button></form>{% endif %}
+</td></tr>
+{% else %}<tr><td colspan="8" class="text-center text-muted">No examiners yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

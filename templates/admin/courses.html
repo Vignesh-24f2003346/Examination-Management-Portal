@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3"><h3>Courses</h3><a class="btn btn-primary" href="{{ url_for('course_form') }}">Add Course</a></div>
+<div class="table-responsive"><table class="table table-bordered bg-white align-middle">
+<tr><th>ID</th><th>Code</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr>
+{% for c in courses %}
+<tr><td>{{ c.id }}</td><td>{{ c.code }}</td><td>{{ c.name }}</td><td>{{ c.description or '' }}</td><td>{{ badge(c.status) }}</td>
+<td class="text-nowrap"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('course_form', cid=c.id) }}">Edit</a>
+<form method="post" action="{{ url_for('course_delete', cid=c.id) }}" class="d-inline"><button class="btn btn-sm btn-outline-danger">Remove</button></form></td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted">No courses yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

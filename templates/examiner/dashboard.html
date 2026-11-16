@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Examiner Dashboard</h3>
+
+<div class="row g-3 mb-3">
+  {% for label, n in [('Assigned Examinations', exams|length), ('Slots Created', slots|length), ('Students Booked', booked), ('Pending Evaluations', pending)] %}
+  <div class="col-6 col-md-3"><div class="card text-center"><div class="card-body"><div class="stat n" style="font-size:2rem;font-weight:700;color:#3b5bdb">{{ n }}</div><div class="text-muted small">{{ label }}</div></div></div></div>
+  {% endfor %}
+</div>
+
+<h5>Assigned Examinations</h5>
+<div class="table-responsive"><table class="table align-middle">
+<tr><th>Course</th><th>Examination</th><th>Type</th><th>Slot Creation Period</th><th>Booking Period</th><th>Status</th><th></th></tr>
+{% for e in exams %}
+<tr><td>{{ e.course_code }}</td><td>{{ e.name }}</td><td>{{ e.exam_type }}</td><td>{{ e.slot_create_start }} to {{ e.slot_create_end }}</td><td>{{ e.book_start }} to {{ e.book_end }}</td><td>{{ badge(e.status) }}</td>
+<td>{% if e.can_create %}<a class="btn btn-sm btn-primary" href="{{ url_for('slot_form') }}">Create Slot</a>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="text-center text-muted">No examinations assigned yet.</td></tr>{% endfor %}
+</table></div>
+
+<div class="d-flex justify-content-between align-items-center"><h5>My Slots</h5><a class="btn btn-sm btn-primary" href="{{ url_for('slot_form') }}">+ Create Slot</a></div>
+<div class="table-responsive"><table class="table align-middle">
+<tr><th>Examination</th><th>Date</th><th>Time</th><th>Booked</th><th>Status</th><th>Actions</th></tr>
+{% for s in slots %}
+<tr><td>{{ s.course_code }} - {{ s.exam_name }}</td><td>{{ s.date }}</td><td>{{ s.start_time }} - {{ s.end_time }}</td><td>{{ s.capacity - s.available_seats }}/{{ s.capacity }}</td><td>{{ badge(s.status) }}</td>
+<td class="text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('slot_detail', sid=s.id) }}">Students / Evaluate</a>
+{% if s.editable %}<a class="btn btn-sm btn-outline-primary" href="{{ url_for('slot_form', sid=s.id) }}">Edit</a>
+<form method="post" action="{{ url_for('slot_delete', sid=s.id) }}" class="d-inline"><button class="btn btn-sm btn-outline-danger">Remove</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted">No slots yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

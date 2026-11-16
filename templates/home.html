@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="fw-bold">Examination Management Portal</h1>
+  <p class="lead text-muted">Examinations, slots, bookings and results in one place.</p>
+  <div class="d-flex justify-content-center gap-2 mt-4">
+  {% if me %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+  {% else %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}">Login</a>
+    <a class="btn btn-outline-primary btn-lg" href="{{ url_for('register') }}">Register</a>
+  {% endif %}
+  </div>
+</div>
+<div class="row g-3 justify-content-center">
+  {% for title, text in [('Admin', 'Manages courses, examinations, rubrics and examiners.'), ('Examiner', 'Creates slots and evaluates students.'), ('Student', 'Books slots and views results.')] %}
+  <div class="col-md-4"><div class="card h-100"><div class="card-body text-center"><h5 class="mt-0">{{ title }}</h5><p class="mb-0 text-muted">{{ text }}</p></div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Student Dashboard</h3>
+
+<h5>Available Examinations</h5>
+<div class="table-responsive"><table class="table align-middle">
+<tr><th>Course</th><th>Examination</th><th>Type</th><th>Booking Ends</th><th></th></tr>
+{% for e in open_exams %}<tr><td>{{ e.course_code }}</td><td>{{ e.name }}</td><td>{{ e.exam_type }}</td><td>{{ e.book_end }}</td><td><a class="btn btn-sm btn-primary" href="{{ url_for('student_exam', eid=e.id) }}">View slots</a></td></tr>
+{% else %}<tr><td colspan="5" class="text-center text-muted">No examinations are open for booking right now.</td></tr>{% endfor %}
+</table></div>
+
+<h5>Available Examination Slots</h5>
+<div class="table-responsive"><table class="table align-middle">
+<tr><th>Examination</th><th>Date</th><th>Time</th><th>Examiner</th><th>Seats</th><th></th></tr>
+{% for s in avail_slots %}<tr><td>{{ s.exam_name }}</td><td>{{ s.date }}</td><td>{{ s.start_time }} - {{ s.end_time }}</td><td>{{ s.examiner_name }}</td><td>{{ s.available_seats }}</td>
+<td><form method="post" action="{{ url_for('book', sid=s.id) }}"><button class="btn btn-sm btn-success">Book</button></form></td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted">No slots available.</td></tr>{% endfor %}
+</table></div>
+
+<h5>Upcoming Examinations</h5>
+<div class="table-responsive"><table class="table">
+<tr><th>Examination</th><th>Date</th><th>Time</th><th>Examiner</th></tr>
+{% for b in upcoming %}<tr><td>{{ b.exam_name }}</td><td>{{ b.date }}</td><td>{{ b.start_time }} - {{ b.end_time }}</td><td>{{ b.examiner_name }}</td></tr>
+{% else %}<tr><td colspan="4" class="text-center text-muted">Nothing upcoming.</td></tr>{% endfor %}
+</table></div>
+
+<h5>Booked Slots</h5>
+<div class="table-responsive"><table class="table">
+<tr><th>Booking</th><th>Examination</th><th>Date</th><th>Time</th><th>Status</th></tr>
+{% for b in booked %}<tr><td>{{ b.id }}</td><td>{{ b.exam_name }}</td><td>{{ b.date }}</td><td>{{ b.start_time }} - {{ b.end_time }}</td><td>{{ badge(b.status) }}</td></tr>
+{% else %}<tr><td colspan="5" class="text-center text-muted">No active bookings.</td></tr>{% endfor %}
+</table></div>
+
+<h5>Published Results</h5>
+<div class="table-responsive"><table class="table">
+<tr><th>Examination</th><th>Marks</th><th>Remarks</th></tr>
+{% for r in results %}<tr><td>{{ r.exam_name }}</td><td>{{ '%g'|format(r.total) }} / {{ '%g'|format(r.max_marks) }}</td><td>{{ r.remarks or '' }}</td></tr>
+{% else %}<tr><td colspan="3" class="text-center text-muted">No results published yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

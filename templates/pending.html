@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="alert alert-warning">
+  {% if me.status == 'Pending' %}Your examiner account is awaiting admin approval. You will get access to the dashboard once it is approved.
+  {% else %}Your examiner account has been deactivated. Please contact the admin.{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">Search results for "{{ term }}"</h3>
+{% if not term %}<p class="text-muted">Enter a name or ID in the search box.</p>{% endif %}
+<h5>Students</h5>
+<table class="table table-sm bg-white"><tr><th>ID</th><th>Name</th><th>Email</th></tr>
+{% for s in students %}<tr><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.email }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">None</td></tr>{% endfor %}</table>
+<h5>Examiners</h5>
+<table class="table table-sm bg-white"><tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th></tr>
+{% for s in examiners %}<tr><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.email }}</td><td>{{ badge(s.status) }}</td></tr>{% else %}<tr><td colspan="4" class="text-muted">None</td></tr>{% endfor %}</table>
+<h5>Examinations</h5>
+<table class="table table-sm bg-white"><tr><th>ID</th><th>Course</th><th>Name</th><th>Status</th><th></th></tr>
+{% for e in exams %}<tr><td>{{ e.id }}</td><td>{{ e.course_code }}</td><td>{{ e.name }}</td><td>{{ badge(e.status) }}</td><td><a href="{{ url_for('exam_detail', eid=e.id) }}">Manage</a></td></tr>{% else %}<tr><td colspan="5" class="text-muted">None</td></tr>{% endfor %}</table>
+<h5>Bookings</h5>
+<table class="table table-sm bg-white"><tr><th>ID</th><th>Student</th><th>Examination</th><th>Date</th><th>Status</th></tr>
+{% for b in bookings %}<tr><td>{{ b.id }}</td><td>{{ b.student_name }}</td><td>{{ b.exam_name }}</td><td>{{ b.date }}</td><td>{{ badge(b.status) }}</td></tr>{% else %}<tr><td colspan="5" class="text-muted">None</td></tr>{% endfor %}</table>
+{% endblock %}

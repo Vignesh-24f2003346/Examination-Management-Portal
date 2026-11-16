@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{ e.course_code }} - {{ e.name }} {{ badge(e.status) }}</h3>
+<p>{{ e.exam_type }} | {{ e.duration }} min | Maximum marks {{ '%g'|format(e.max_marks) }} | Booking {{ e.book_start }} to {{ e.book_end }}</p>
+{% if e.description %}<p>{{ e.description }}</p>{% endif %}
+{% if rubrics %}<p><b>Evaluation criteria:</b> {% for r in rubrics %}{{ r.criterion }} ({{ '%g'|format(r.max_marks) }}){{ ', ' if not loop.last }}{% endfor %}</p>{% endif %}
+{% if mine %}<div class="alert alert-info">You already have a booking for this examination (status: {{ badge(mine.status) }}).</div>{% endif %}
+<h5>Slots</h5>
+<div class="table-responsive"><table class="table table-bordered bg-white align-middle">
+<tr><th>Date</th><th>Time</th><th>Examiner</th><th>Seats Left</th><th>Status</th><th></th></tr>
+{% for s in slots %}<tr><td>{{ s.date }}</td><td>{{ s.start_time }} - {{ s.end_time }}</td><td>{{ s.examiner_name }}</td><td>{{ s.available_seats }}/{{ s.capacity }}</td><td>{{ badge(s.status) }}</td>
+<td>{% if can_book and s.status == 'Available' %}<form method="post" action="{{ url_for('book', sid=s.id) }}"><button class="btn btn-sm btn-success">Book</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted">No slots created yet.</td></tr>{% endfor %}
+</table></div>
+<a class="btn btn-secondary" href="{{ url_for('student_exams') }}">Back</a>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8"><div class="card shadow-sm"><div class="card-body">
+<h4>Evaluate {{ b.student_name }}</h4>
+<p class="text-muted">{{ b.course_code }} - {{ b.exam_name }} | Maximum marks {{ '%g'|format(b.max_marks) }}</p>
+<form method="post">
+  <table class="table align-middle">
+  <tr><th>Criterion</th><th>Max</th><th style="width:140px">Marks</th></tr>
+  {% for r in rubrics %}
+  <tr><td>{{ r.criterion }}<div class="small text-muted">{{ r.description or '' }}</div></td><td>{{ '%g'|format(r.max_marks) }}</td>
+  <td><input type="number" step="any" min="0" max="{{ r.max_marks }}" name="m_{{ r.id }}" value="{{ existing.get(r.id, '') }}" class="form-control" required></td></tr>
+  {% endfor %}
+  </table>
+  <div class="mb-3"><label class="form-label">Remarks</label><textarea name="remarks" class="form-control" rows="3">{{ ev.remarks if ev else '' }}</textarea></div>
+  <button class="btn btn-primary">Submit Marks</button>
+  <a class="btn btn-secondary" href="{{ url_for('slot_detail', sid=b.slot_id) }}">Cancel</a>
+</form>
+</div></div></div></div>
+{% endblock %}

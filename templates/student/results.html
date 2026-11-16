@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">Results and Feedback</h3>
+{% for r in results %}
+<div class="card mb-3 shadow-sm"><div class="card-body">
+  <h5>{{ r.course_code }} - {{ r.exam_name }} <span class="badge text-bg-primary">{{ '%g'|format(r.total) }} / {{ '%g'|format(r.max_marks) }}</span></h5>
+  <div class="text-muted small mb-2">{{ r.date }} | Examiner: {{ r.examiner_name }}</div>
+  <table class="table table-sm"><tr><th>Criterion</th><th>Marks</th></tr>
+  {% for s in r.scores %}<tr><td>{{ s.criterion }}</td><td>{{ '%g'|format(s.marks) }} / {{ '%g'|format(s.max_marks) }}</td></tr>{% endfor %}</table>
+  <b>Remarks:</b> {{ r.remarks or 'No remarks.' }}
+</div></div>
+{% else %}<p class="text-muted">No results have been published yet.</p>{% endfor %}
+{% endblock %}

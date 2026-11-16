@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+{% set order = ['Draft', 'Slot Creation', 'Booking Open', 'Closed', 'Completed'] %}
+{% set nxt = {'Draft': ('open_slots', 'Open slot creation', 'Examiners cannot create slots yet. Add rubrics and assign examiners, then open slot creation.'),
+              'Slot Creation': ('open_booking', 'Open student booking', 'Examiners can create slots now. When enough slots exist, open booking so students can book.'),
+              'Booking Open': ('close_booking', 'Close student booking', 'Students can book now. Close booking when the booking period is over.'),
+              'Closed': ('complete', 'Mark examination completed', 'Booking is closed. Mark the examination completed once marks are done.')} %}
+<div class="d-flex justify-content-between flex-wrap align-items-center mb-3">
+  <h3>{{ e.course_code }} - {{ e.name }} {{ badge(e.status) }}</h3>
+  <a class="btn btn-outline-primary" href="{{ url_for('exam_form', eid=e.id) }}">Edit details / dates</a>
+</div>
+
+<div class="card mb-3"><div class="card-body">
+  <h5 class="mt-0">Stage</h5>
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    {% for st in order %}<span class="badge {{ 'text-bg-primary' if st == e.status else 'text-bg-light border' }} px-3 py-2">{{ loop.index }}. {{ st }}</span>{% endfor %}
+  </div>
+  {% if e.status in nxt %}
+  <form method="post" action="{{ url_for('exam_status', eid=e.id, action=nxt[e.status][0]) }}"><button class="btn btn-success">Next step: {{ nxt[e.status][1] }}</button></form>
+  {% else %}<p class="mb-0">This examination is completed.</p>{% endif %}
+  <details class="mt-3"><summary class="small text-muted">Other actions</summary>
+    <div class="d-flex flex-wrap gap-2 mt-2">
+    {% for action, label, style in [('open_slots','Open Slot Creation','success'),('close_slots','Close Slot Creation','warning'),('open_booking','Open Student Booking','success'),('close_booking','Close Student Booking','warning'),('complete','Mark Completed','dark')] %}
+      <form method="post" action="{{ url_for('exam_status', eid=e.id, action=action) }}"><button class="btn btn-sm btn-outline-{{ style }}">{{ label }}</button></form>
+    {% endfor %}
+    </div>
+  </details>
+</div></div>
+
+<div class="card mb-3"><div class="card-body row">
+  <div class="col-md-4"><b>Type:</b> {{ e.exam_type }}<br><b>Duration:</b> {{ e.duration }} min<br><b>Maximum Marks:</b> {{ '%g'|format(e.max_marks) }}</div>
+  <div class="col-md-4"><b>Slot creation period:</b><br>{{ e.slot_create_start }} to {{ e.slot_create_end }}</div>
+  <div class="col-md-4"><b>Student booking period:</b><br>{{ e.book_start }} to {{ e.book_end }}</div>
+  {% if e.description %}<div class="col-12 mt-2">{{ e.description }}</div>{% endif %}
+</div></div>
+
+<div class="card mb-3"><div class="card-body">
+  <div class="d-flex justify-content-between align-items-center"><h5 class="mt-0">Rubrics (total {{ '%g'|format(rub_total) }} / {{ '%g'|format(e.max_marks) }})</h5>
+  <a class="btn btn-sm btn-primary" href="{{ url_for('rubric_form', eid=e.id) }}">+ Add Rubric</a></div>
+  <div class="table-responsive"><table class="table table-sm">
+  <tr><th>ID</th><th>Criterion</th><th>Max Marks</th><th>Weightage</th><th>Description</th><th></th></tr>
+  {% for r in rubrics %}
+  <tr><td>{{ r.id }}</td><td>{{ r.criterion }}</td><td>{{ '%g'|format(r.max_marks) }}</td><td>{{ '%g'|format(r.weightage) }}%</td><td>{{ r.description or '' }}</td>
+  <td class="text-nowrap"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('rubric_form', rid=r.id) }}">Edit</a>
+  <form method="post" action="{{ url_for('rubric_delete', rid=r.id) }}" class="d-inline"><button class="btn btn-sm btn-outline-danger">Remove</button></form></td></tr>
+  {% else %}<tr><td colspan="6" class="text-muted">No rubrics defined.</td></tr>{% endfor %}
+  </table></div>
+</div></div>
+
+<div class="card mb-3"><div class="card-body">
+  <h5 class="mt-0">Assigned Examiners</h5>
+  <ul class="list-group mb-3">
+  {% for x in examiners %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">{{ x.name }} ({{ x.department or '-' }})
+    <form method="post" action="{{ url_for('exam_unassign', eid=e.id, uid=x.id) }}"><button class="btn btn-sm btn-outline-danger">Remove</button></form></li>
+  {% else %}<li class="list-group-item text-muted">No examiners assigned.</li>{% endfor %}
+  </ul>
+  {% if free %}
+  <form method="post" action="{{ url_for('exam_assign', eid=e.id) }}" class="d-flex gap-2">
+    <select name="examiner_id" class="form-select" required>
+      {% for x in free %}<option value="{{ x.id }}">{{ x.name }} ({{ x.email }})</option>{% endfor %}
+    </select><button class="btn btn-primary">Assign</button>
+  </form>
+  {% else %}<div class="text-muted">No other approved examiners.</div>{% endif %}
+</div></div>
+
+<div class="card"><div class="card-body">
+  <h5 class="mt-0">Slots</h5>
+  <div class="table-responsive"><table class="table table-sm">
+  <tr><th>ID</th><th>Date</th><th>Time</th><th>Examiner</th><th>Seats</th><th>Status</th></tr>
+  {% for s in slots %}<tr><td>{{ s.id }}</td><td>{{ s.date }}</td><td>{{ s.start_time }} - {{ s.end_time }}</td><td>{{ s.examiner_name }}</td><td>{{ s.available_seats }}/{{ s.capacity }}</td><td>{{ badge(s.status) }}</td></tr>
+  {% else %}<tr><td colspan="6" class="text-muted">No slots created.</td></tr>{% endfor %}
+  </table></div>
+</div></div>
+{% endblock %}

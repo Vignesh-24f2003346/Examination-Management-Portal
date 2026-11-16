@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">Examinations</h3>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-4"><input class="form-control" name="q" placeholder="Search by examination or course" value="{{ f.q }}"></div>
+  <div class="col-md-2"><select name="course" class="form-select"><option value="">All courses</option>{% for c in courses %}<option value="{{ c.id }}" {{ 'selected' if f.course|string == c.id|string }}>{{ c.code }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><select name="type" class="form-select"><option value="">All types</option>{% for t in types %}<option {{ 'selected' if f.type == t }}>{{ t }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><select name="status" class="form-select"><option value="">All statuses</option>{% for t in statuses %}<option {{ 'selected' if f.status == t }}>{{ t }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><button class="btn btn-primary w-100">Search</button></div>
+</form>
+<div class="table-responsive"><table class="table table-bordered bg-white align-middle">
+<tr><th>Course</th><th>Examination</th><th>Type</th><th>Duration</th><th>Max Marks</th><th>Booking Window</th><th>Status</th><th></th></tr>
+{% for e in exams %}<tr><td>{{ e.course_code }}</td><td>{{ e.name }}</td><td>{{ e.exam_type }}</td><td>{{ e.duration }} min</td><td>{{ '%g'|format(e.max_marks) }}</td><td>{{ e.book_start }} to {{ e.book_end }}</td><td>{{ badge(e.status) }}</td>
+<td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('student_exam', eid=e.id) }}">View</a></td></tr>
+{% else %}<tr><td colspan="8" class="text-center text-muted">No examinations found.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}
